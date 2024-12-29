@@ -11,9 +11,10 @@ este dispositivo es muy vistoso pero programarlo es una pesadilla, y lo que func
 
 por ahora esto es lo que hay. 
 me voy a poner a adaptar esto mismo para circuit python ya que alli quizas si sea posible mostrar en el display datos de la sd ... en fin...
-en principio con descargar todo este paquete y subirlo a la raiz del esp32-s3-geek en cirguitpython deberia funcionar
-en el main.py hay varios ejemplos de funciones posibles , descomenta y comenta lineas y mira lo que pasa, ademas hay un intento de documentacion mas abajo.... 
-esto esta en construccion, sepan disculpar el desorden
+en principio con descargar todo este paquete y subirlo a la raiz del esp32-s3-geek en cirguitpython deberia funcionar.
+
+En el main.py hay varios ejemplos de funciones posibles , descomenta y comenta lineas y mira lo que pasa, ademas hay un intento de documentacion mas abajo.... 
+esto esta en construccion, sepan disculpar el desorden...
 
 ################################################################################################################################################################
 
