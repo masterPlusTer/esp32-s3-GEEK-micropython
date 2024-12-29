@@ -77,6 +77,7 @@ def set_active_window(x0, y0, x1, y1):
     write_data(y0 & 0xFF)
     write_data(y1 >> 8)
     write_data(y1 & 0xFF)
+
 def set_rotation(rotation):
     """
     Configura la orientación del display.
@@ -86,6 +87,9 @@ def set_rotation(rotation):
     if rotation < 0 or rotation > 3:
         raise ValueError("La rotación debe ser 0, 1, 2 o 3")
     
+    global _current_rotation
+    _current_rotation = rotation  # Guardar la rotación actual
+
     write_cmd(0x36)  # Comando MADCTL
     write_data(madctl_values[rotation])
 
@@ -96,7 +100,14 @@ def set_rotation(rotation):
     else:
         WIDTH, HEIGHT = 320, 240
         OFFSET_X, OFFSET_Y = 40, 52
-            
+
+def get_rotation():
+    """
+    Devuelve la rotación actualmente configurada.
+    :return: Entero entre 0 y 3 (0: normal, 1: 90°, 2: 180°, 3: 270°)
+    """
+    return _current_rotation
+      
 
 def fill_screen(color):
     """Llena toda la pantalla con un color usando un buffer por líneas."""
