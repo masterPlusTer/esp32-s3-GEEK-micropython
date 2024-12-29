@@ -1,5 +1,7 @@
 intentando incluir todo lo necesario para poder controlar el esp32-s3-geek. 
+
 Hasta ahora estoy trabajando en la parte del display, ya hay una interface novato friendly para empezar a dibujar formas , figuras y escribir texto.
+
 He logrado corregir el temita de los colores, por algun motivo el codigo de ejemplo proporcionado por waveshare venia con el display inicializado en BRG ( si, no es un typo, BRG, primero azul, luego rojo y luego verde) yo no se si esto fue por un error o si habia detras una intencion muy bien orquestada para dominarnos a todos, quizas sea lo segundo pero era muy incomodo trabajar con los colores asi, ademas me parecia un desperdicio de recursos tener que estar convirtiendo a nivel de bits cada vez que habia que hacer algo con los colores, entonces aqui esta, RGB como Dios manda.
 
 TO DO LIST:
