@@ -5,7 +5,7 @@ Hasta ahora estoy trabajando en la parte del display, ya hay una interface novat
 He logrado corregir el temita de los colores, por algun motivo el codigo de ejemplo proporcionado por Waveshare venia con el display inicializado en BRG ( si, no es un typo, BRG, primero azul, luego rojo y luego verde) yo no se si esto fue por un error o si habia detras una intencion muy bien orquestada para dominarnos a todos, quizas sea lo segundo pero era muy incomodo trabajar con los colores asi, ademas me parecia un desperdicio de recursos tener que estar convirtiendo a nivel de bits cada vez que habia que hacer algo con los colores, entonces aqui esta, RGB como Dios manda.
 
 TO DO LIST:
-mi intencion es agregar clases para trabajar con la conectividad wifi y bluetooth y quizas tambien integrar un modulo para trabajar con la tarjeta SD aunque no prometo nada porque ya he estado intentandolo por todos los medios y no hay con que darle...
+mi intencion es agregar modulos para trabajar con la conectividad wifi y bluetooth y quizas tambien integrar un modulo para trabajar con la tarjeta SD aunque no prometo nada porque ya he estado intentandolo por todos los medios y no hay con que darle...
 
 este dispositivo es muy vistoso pero programarlo es una pesadilla, y lo que funciona en micropython no funciona en circuitpython y se hace imposible integrar en un unico programa todo lo que el esp32s3-geek tiene para ofrecer.
 
