@@ -4,11 +4,11 @@ Hasta ahora estoy trabajando en la parte del display, ya hay una interface novat
 
 He logrado corregir el temita de los colores, por algun motivo el codigo de ejemplo proporcionado por Waveshare venia con el display inicializado en BRG ( si, no es un typo, BRG, primero azul, luego rojo y luego verde) yo no se si esto fue por un error o si habia detras una intencion muy bien orquestada para dominarnos a todos, quizas sea lo segundo pero era muy incomodo trabajar con los colores asi, ademas me parecia un desperdicio de recursos tener que estar convirtiendo a nivel de bits cada vez que habia que hacer algo con los colores, entonces aqui esta, RGB como Dios manda.
 
-TO DO LIST:
-mi intencion es agregar modulos para trabajar con la conectividad wifi y bluetooth y quizas tambien integrar un modulo para trabajar con la tarjeta SD aunque no prometo nada porque ya he estado intentandolo por todos los medios y no hay con que darle...
-
 este dispositivo es muy vistoso pero programarlo es una pesadilla, y lo que funciona en micropython no funciona en circuitpython y se hace imposible integrar en un unico programa todo lo que el esp32s3-geek tiene para ofrecer.
 
+
+TO DO LIST:
+mi intencion es agregar modulos para trabajar con la conectividad wifi y bluetooth y quizas tambien integrar un modulo para trabajar con la tarjeta SD aunque no prometo nada porque ya he estado intentandolo por todos los medios y no hay con que darle...
 por ahora esto es lo que hay. 
 me voy a poner a adaptar esto mismo para circuit python ya que alli quizas si sea posible mostrar en el display datos de la sd ... en fin...
 en principio con descargar todo este paquete y subirlo a la raiz del esp32-s3-geek en micropython deberia funcionar.
@@ -120,6 +120,14 @@ Los archivos que debes incluir en tu proyecto son:
 - `draw.py`: Funciones para dibujar en la pantalla.
 - `write.py`: Funciones para escribir texto en la pantalla.
 - `image.py`: Función para mostrar imágenes BMP en la pantalla.
+
+
+
+# Conectividad del ESP32-S3-GEEK
+
+el modulo connectivity.py  abarca wifi, blutooth y ESP - NOW
+IMPORTANTE wifi y ESP NOW comparten la misma antena, por lo cual se generan conflictos al intentar inicializar ambos protocolos y no funciona ni el uno ni el otro
+ESP - NOW puede ser usado simultaneamente con bluetooth sin problemas ( I think ) todavia estoy trabajando en el desarrollo de este modulo.
 
 
 ## he incluido un ejemplo de interface interfaceUI.py
