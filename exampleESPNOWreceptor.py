@@ -1,4 +1,4 @@
-import ESPNOW
+import connectivity
 import display
 import write
 
@@ -10,15 +10,15 @@ display.set_rotation(3)  # Apaisado (90 grados)
 
 # Inicializar ESP-NOW
 print("Inicializando ESP-NOW...")
-ESPNOW.init_espnow()
+connectivity.init_espnow()
 print("my mac adress is")
-print(ESPNOW.get_my_mac())
+print(connectivity.get_my_mac())
 # Mostrar mensaje inicial
 print("Esperando mensajes...")
 
 # Escuchar mensajes en un bucle
 while True:
-        host, mensaje = ESPNOW.recibir_mensajes()  # Recibe mensajes del módulo
+        host, mensaje = connectivity.recibir_mensajes()  # Recibe mensajes del módulo
         if mensaje:
             print(f"Mensaje recibido de {host}: {mensaje.decode('utf-8')}")
             
