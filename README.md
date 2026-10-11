@@ -128,53 +128,95 @@ El display y la microSD usan interfaces SPI con configuraciones diferentes, así
 
 # 2. Instalación
 
-En principio, con copiar los módulos necesarios a la raíz del sistema de archivos de MicroPython debería funcionar.
+Antes, todos los archivos estaban amontonados en la raíz. Ahora los módulos reutilizables viven en **`/lib`**, que es donde MicroPython los busca normalmente. Un poco de orden tampoco viene mal, aunque no prometo que dure para siempre.
 
-Digo *en principio* porque estamos hablando de microcontroladores, y estos bichos tienen una habilidad admirable para encontrar excepciones a las reglas.
+## Estructura del proyecto
 
-## Archivos principales
+Esta es la estructura de la versión actual del repositorio. En GitHub la carpeta raíz del proyecto contiene lo siguiente; **en la placa**, copiá la carpeta `lib` entera a `/lib` y los programas de la raíz directamente a `/`.
 
 ```text
 /
-├── display.py
-├── draw.py
-├── write.py
-├── image.py
-│
-├── font_small.py
-├── font_medium.py
-├── font_large.py
-│
-├── sdspi_raw.py
-├── sd_files.py
-│
-├── connectivity.py
-├── wifi_safe.py
-│
-├── geek_app.py
-├── geek_diagnostic.py
-│
-└── secrets.py
+├── main.py                  # Demo grafica; se ejecuta al arrancar
+├── geek_app.py              # Aplicacion interactiva (REPL + ST7789)
+├── exampleUI.py             # Ejemplo de interfaz
+├── ESP32-S3-GEEK.bmp        # Imagen de ejemplo
+├── lib/
+│   ├── display.py           # Controlador ST7789
+│   ├── draw.py              # Figuras y primitivas graficas
+│   ├── write.py             # Texto
+│   ├── image.py             # Lectura de BMP
+│   ├── font_small.py
+│   ├── font_medium.py
+│   ├── font_large.py
+│   ├── sdspi_raw.py          # Driver SD por SPI
+│   ├── sd_files.py          # Archivos FAT en /sd
+│   ├── connectivity.py      # Wi-Fi, BLE y ESP-NOW
+│   ├── wifi_safe.py         # Wi-Fi con tiempo de espera
+│   ├── geek_diagnostic.py   # Diagnostico de perifericos
+│   ├── interfaceUI.py       # Modulo de interfaz experimental
+│   ├── BLEandWIFIexample.py
+│   ├── exampleESPNOWemisor.py
+│   ├── exampleESPNOWreceptor.py
+│   └── secrets.py           # SOLO ejemplo; no publicar claves reales
+└── README.md                # Documentacion del repositorio
 ```
 
-`secrets.py` es opcional para las funciones que no requieren conectarse a una red Wi-Fi.
-
-El repositorio también puede incluir ejemplos, imágenes y archivos experimentales.
-
-**Importante:** los módulos de texto dependen de los tres archivos de fuentes. Si falta alguno, MicroPython puede producir un `ImportError`.
+Los ejemplos que hoy están en `/lib` se mantienen allí para reflejar el ZIP actual; más adelante sería razonable moverlos a `examples/` dentro del repositorio. En la placa podés ejecutar cualquier ejemplo que necesites, pero no lo llames `main.py` a menos que quieras que arranque automáticamente.
 
 ## Instalación mediante Thonny
 
-1. Instalar MicroPython compatible con ESP32-S3.
-2. Conectar el ESP32-S3-GEEK por USB.
-3. Seleccionar el intérprete MicroPython en Thonny.
-4. Copiar los archivos de la biblioteca a la memoria del dispositivo.
-5. Reiniciar MicroPython.
-6. Ejecutar uno de los ejemplos.
+1. Instalar un firmware de MicroPython compatible con ESP32-S3 y conectar la placa por USB.
+2. Seleccionar el intérprete de MicroPython en Thonny.
+3. Crear `/lib` en el sistema de archivos de la placa, si todavía no existe.
+4. Copiar **los archivos de `lib/` a `/lib/`** conservando sus nombres. No hace falta copiar el README ni los ejemplos para usar los controladores.
+5. Copiar `geek_app.py` (y, si querés, `exampleUI.py` y la imagen BMP) a `/`.
+6. Reiniciar MicroPython y ejecutar el programa que quieras.
 
-Para comenzar, recomiendo probar primero el display y después el diagnóstico completo.
+**Ojo con `main.py`:** MicroPython lo ejecuta automáticamente al arrancar. El `main.py` de este repositorio es una demo gráfica y no un menú de selección. Si no querés ejecutarla cada vez que reiniciás, no la copies o renombrala, por ejemplo, `graphics_demo.py`.
 
-No es necesario ejecutar todo desde un `main.py`. También se pueden importar los módulos individualmente desde el REPL.
+## ¿Hay que cambiar los imports?
+
+No, siempre que `/lib` aparezca en `sys.path`, como ocurre normalmente en MicroPython para ESP32:
+
+```python
+import sys
+print(sys.path)
+
+import display
+import draw
+import write
+from sd_files import SDStorage
+
+print(display.__file__)  # Esperado: /lib/display.py
+```
+
+**No guardes otra copia de `display.py` o `draw.py` en `/`:** podría cargarse primero la versión antigua y volveríamos a jugar a la ruleta de los `ImportError` y `AttributeError`.
+
+`write.py` necesita `font_small.py`, `font_medium.py` y `font_large.py`. La imagen BMP es un **recurso**, no un módulo: si la movés a otra carpeta, cambiá su ruta al llamar a `image.show_bmp(...)`.
+
+## Primeras pruebas
+
+Para ejecutar la aplicación desde Thonny:
+
+```python
+import geek_app
+geek_app.main()
+```
+
+Para ejecutar el diagnóstico:
+
+```python
+import geek_diagnostic
+geek_diagnostic.main()
+```
+
+`geek_diagnostic.py` está dentro de `/lib`, pero se importa por su nombre normal. Su ejecución no depende de que esté en la raíz.
+
+## Credenciales Wi-Fi
+
+El ZIP actual incluye `lib/secrets.py` con valores de ejemplo. **No escribas ahí credenciales reales si vas a subir ese archivo a GitHub.** Conviene mantener un `secrets_example.py` público y un `secrets.py` privado, ignorado con `.gitignore`.
+
+En los ejemplos de conexión se importa `secrets` directamente, por lo que podés colocar tu archivo privado en `/secrets.py` de la placa. Nunca publiques contraseñas reales; si ya las publicaste, cambiá la contraseña y limpiá el historial del repositorio.
 
 ---
 
@@ -666,36 +708,37 @@ Se incorporó una implementación con control de tiempo de espera para evitar qu
 
 ## Módulo `wifi_safe.py`
 
-Ejemplo:
+La implementación actual usa la clase `WiFi`: `connect()` recibe el timeout en **milisegundos** y devuelve la tupla de configuración de red. Ejemplo:
 
 ```python
-import wifi_safe
+from wifi_safe import WiFi
 
-wlan = wifi_safe.connect(
+wifi = WiFi()
+config = wifi.connect(
     "MI_RED",
     "MI_PASSWORD",
-    timeout=15
+    timeout_ms=15000
 )
 
-print(wlan.ifconfig())
+print(config)  # Tupla IP, mascara, gateway, DNS
 ```
 
 ## Desconectar
 
 ```python
-wifi_safe.disconnect()
+wifi.disconnect()
 ```
 
 ## Credenciales
 
-Para los ejemplos que utilizan un archivo de configuración, se puede crear `secrets.py`:
+Para los ejemplos que utilizan un archivo de configuración, se puede crear `/secrets.py` **en la placa** (sin publicarlo):
 
 ```python
 WIFI_SSID = "MI_RED"
 WIFI_PASSWORD = "MI_PASSWORD"
 ```
 
-No publiques este archivo con tus contraseñas reales en GitHub.
+No publiques este archivo con tus contraseñas reales en GitHub. El `lib/secrets.py` incluido actualmente es un ejemplo, no un lugar donde convenga guardar claves que luego vas a subir al repositorio.
 
 ## Pruebas realizadas
 
@@ -926,7 +969,7 @@ Esa es justamente la idea.
 
 El archivo `write.py` no se encuentra en la ruta de importación de MicroPython.
 
-Verificar que esté guardado en la placa, junto con:
+Verificar que esté guardado en `/lib` en la placa, junto con:
 
 ```text
 font_small.py
@@ -977,6 +1020,10 @@ Comprobar SSID, contraseña, cobertura y compatibilidad de la red.
 El ESP32-S3 utiliza Wi-Fi de 2,4 GHz.
 
 Utilizar un timeout para evitar que el programa espere indefinidamente.
+
+## `ImportError` tras mover los archivos a `/lib`
+
+Comprobá `sys.path` y confirmá que `/lib` está incluida. Revisá que no hayan quedado archivos duplicados en la raíz y reiniciá MicroPython después de mover los módulos.
 
 ## `MemoryError`
 
@@ -1041,9 +1088,6 @@ Se aceptan sugerencias, correcciones y contribuciones.
 Y si encuentran alguna conspiración internacional relacionada con el orden BRG de los colores, por favor avisen.
 
 Quiero saber si finalmente teníamos razón.
-
-
-
 
 
 
