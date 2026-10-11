@@ -1,4 +1,5 @@
 import network
+import time
 import bluetooth
 from espnow import ESPNow
 
@@ -9,7 +10,7 @@ class WiFiManager:
         """
         self.wlan = network.WLAN(network.STA_IF)
 
-    def connect(self, ssid, password):
+    def connect(self, ssid, password, timeout=15):
         """
         Conecta el ESP32-S3 a una red Wi-Fi.
         
@@ -20,8 +21,16 @@ class WiFiManager:
         if not self.wlan.isconnected():
             print(f"Conectando a {ssid}...")
             self.wlan.connect(ssid, password)
+            started = time.ticks_ms()
             while not self.wlan.isconnected():
-                pass
+                if time.ticks_diff(time.ticks_ms(), started) > timeout * 1000:
+                    self.wlan.disconnect()
+                    raise OSError("Wi-Fi timeout after %d seconds" % timeout)
+                status = self.wlan.status()
+                if status in (-3, -2, -1):
+                    self.wlan.disconnect()
+                    raise OSError("Wi-Fi connection status %d" % status)
+                time.sleep_ms(200)
         print("Conectado a Wi-Fi:", self.wlan.ifconfig())
 
     def disconnect(self):
@@ -83,7 +92,7 @@ class BluetoothManager:
         """
         Manejador de interrupciones BLE.
         """
-        if event == bluetooth._IRQ_GATTS_WRITE:
+        if event == 3:  # _IRQ_GATTS_WRITE; no private constant dependency
             conn_handle, attr_handle = data
             if "on_receive" in self.callbacks:
                 self.callbacks["on_receive"](conn_handle, attr_handle)
@@ -105,9 +114,8 @@ class BluetoothManager:
 
 #ESP NOW
     
-#FAVOR DE RECORDAR QUE EL ESP-NOW Y EL WIFI NO SE LLEVAN BIEN
-#SI VAS A USAR ESPNOW TEN EN CUENTA QUE NO VAS A PODER USAR WIFI PORQUE AMBOS DOS COMPARTEN ANTENA
-#PERO SE PUEDE USAR ESP-NOW CON BLUETOOTH SIN PROBLEMAS :)   
+# Wi-Fi y ESP-NOW pueden coexistir en el mismo canal de radio.
+# Si el STA se conecta al AP, los peers ESP-NOW deben utilizar ese canal.   
     
     
 # Declarar variables globales
@@ -119,8 +127,11 @@ def init_espnow():
     global espnow_instance
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
+    if espnow_instance is not None:
+        return espnow_instance
     espnow_instance = ESPNow()
     espnow_instance.active(True)
+    return espnow_instance
 
 # Función para enviar un mensaje al receptor
 def enviar_mensaje(mac_receptor, mensaje):
@@ -131,6 +142,8 @@ def enviar_mensaje(mac_receptor, mensaje):
     :param mensaje: Mensaje a enviar (str)
     """
     global pares_registrados, espnow_instance  # Asegurar acceso a las variables globales
+    if espnow_instance is None:
+        init_espnow()
     if mac_receptor not in pares_registrados:
         espnow_instance.add_peer(mac_receptor)  # Agregar receptor como par
         pares_registrados.add(mac_receptor)  # Registrar el par manualmente
@@ -175,6 +188,7 @@ def configurar_mac_temporal(nueva_mac):
     wlan.config(mac=nueva_mac)
     mac_configurada = wlan.config('mac')
     print("Dirección MAC configurada:", ':'.join('{:02X}'.format(b) for b in mac_configurada))
+
 
 
 
