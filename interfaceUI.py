@@ -70,3 +70,4 @@ def draw_interface():
             y = 25 + i * 30
             write.text(135, y + 5, item, 0b1111111111100000, 0b0000000000000000, size=8)
 
+
