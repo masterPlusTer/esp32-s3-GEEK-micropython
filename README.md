@@ -1,139 +1,1049 @@
-intentando incluir todo lo necesario para poder controlar el esp32-s3-geek. 
+# ESP32-S3-GEEK MicroPython
 
-Hasta ahora estoy trabajando en la parte del display, ya hay una interface novato friendly para empezar a dibujar formas , figuras y escribir texto.
+### Una biblioteca para controlar el ESP32-S3-GEEK sin perder completamente la paciencia en el intento.
 
-He logrado corregir el temita de los colores, por algun motivo el codigo de ejemplo proporcionado por Waveshare venia con el display inicializado en BRG ( si, no es un typo, BRG, primero azul, luego rojo y luego verde) yo no se si esto fue por un error o si habia detras una intencion muy bien orquestada para dominarnos a todos, quizas sea lo segundo pero era muy incomodo trabajar con los colores asi, ademas me parecia un desperdicio de recursos tener que estar convirtiendo a nivel de bits cada vez que habia que hacer algo con los colores, entonces aqui esta, RGB como Dios manda.
+Hasta ahora he estado trabajando principalmente en la parte del display, intentando crear una interfaz *novato friendly* para empezar a dibujar formas, figuras, escribir texto y mostrar imágenes sin tener que estudiar el funcionamiento interno del ST7789 cada vez que quiero pintar un círculo.
 
-este dispositivo es muy vistoso pero programarlo es una pesadilla, y lo que funciona en micropython no funciona en circuitpython y se hace imposible integrar en un unico programa todo lo que el esp32s3-geek tiene para ofrecer.
+Aunque, dicho sea de paso, recomiendo estudiarlo. Es bastante interesante.
 
+He logrado corregir el temita de los colores. Por algún motivo, el código de ejemplo proporcionado por Waveshare venía con el display inicializado en BRG (sí, no es un typo: primero azul, luego rojo y luego verde).
 
-TO DO LIST:
-mi intencion es agregar modulos para trabajar con la conectividad wifi y bluetooth y quizas tambien integrar un modulo para trabajar con la tarjeta SD aunque no prometo nada porque ya he estado intentandolo por todos los medios y no hay con que darle...
-por ahora esto es lo que hay. 
-me voy a poner a adaptar esto mismo para circuit python ya que alli quizas si sea posible mostrar en el display datos de la sd ... en fin...
-en principio con descargar todo este paquete y subirlo a la raiz del esp32-s3-geek en micropython deberia funcionar.
+Yo no sé si esto fue un error o si había detrás una intención muy bien orquestada para dominarnos a todos. Quizás sea lo segundo.
 
-En el main.py hay varios ejemplos de funciones posibles , descomenta y comenta lineas y mira lo que pasa, ademas hay un intento de documentacion mas abajo.... 
-esto esta en construccion, sepan disculpar el desorden...
+Pero era muy incómodo trabajar con los colores así. Además, me parecía un desperdicio de recursos tener que andar convirtiendo bits cada vez que quería hacer algo tan extravagante como dibujar un cuadrado rojo.
 
-################################################################################################################################################################
+Entonces aquí está: **RGB como Dios manda.**
 
+Este dispositivo es muy vistoso, pero programarlo puede convertirse en una pesadilla. Lo que funciona en MicroPython no necesariamente funciona en CircuitPython, y al principio parecía imposible integrar en un solo programa todo lo que el ESP32-S3-GEEK tiene para ofrecer.
 
-# Librería para el Control de Pantalla en ESP32-S3-GEEK
+Sin embargo, después de bastante experimentar, romper código, arreglarlo, volverlo a romper y descubrir nuevas formas de insultar a una tarjeta SD, hemos avanzado bastante.
 
-Esta librería ha sido desarrollada para controlar la pantalla, dibujar gráficos y escribir texto en el dispositivo ESP32-S3-GEEK utilizando el lenguaje de programación MicroPython. A continuación, se explica el uso de cada módulo y sus funciones.
+**Ahora tenemos:**
 
-## Módulos Importados
-La librería se divide en varios módulos principales:
+- Control del display ST7789.
+- Dibujo de píxeles, líneas, rectángulos, círculos y polígonos.
+- Texto con tres tamaños de fuente.
+- Visualización de imágenes BMP.
+- Control de la tarjeta microSD mediante SPI.
+- Lectura, escritura y eliminación de archivos.
+- Conexión Wi-Fi y búsqueda de redes.
+- Funcionalidades de Bluetooth Low Energy.
+- Inicialización de ESP-NOW.
+- Una aplicación principal con menús.
+- Una herramienta de diagnóstico de periféricos.
 
-### 1. `display`
-Este módulo maneja la inicialización y configuración de la pantalla del ESP32-S3-GEEK.
+Y todo esto utilizando MicroPython, sin depender de una biblioteca externa para hablar con el controlador de la microSD.
 
-- **`init_display()`**: Inicializa el display. Debe llamarse antes de cualquier otra operación en la pantalla.
-- **`fill_screen(color)`**: Llena toda la pantalla con un color dado. El color debe proporcionarse en formato RGB565.
-- **`set_rotation(rotation)`**: Configura la rotación de la pantalla. Los valores posibles son 0 (normal), 1 (90 grados), 2 (180 grados) y 3 (270 grados).
+No hemos reinventado el sistema de archivos FAT, porque tampoco era necesario llegar a semejantes extremos. MicroPython ya proporciona esa parte.
 
-### 2. `draw`
-Este módulo proporciona funciones para dibujar en la pantalla, como píxeles, líneas, círculos y polígonos.
+---
 
-- **`draw_pixel(x, y, color)`**: Dibuja un píxel en las coordenadas `(x, y)` con el color especificado en formato RGB565.
-- **`draw_line(x0, y0, x1, y1, color)`**: Dibuja una línea entre los puntos `(x0, y0)` y `(x1, y1)` con el color especificado en formato RGB565.
-- **`draw_rectangle(x0, y0, x1, y1, color, filled=False)`**: Dibuja un rectángulo. Si `filled=True`, el rectángulo se rellena con el color dado.
-- **`draw_circle(x, y, radius, color, filled=False)`**: Dibuja un círculo. Si `filled=True`, el círculo se rellena con el color dado.
-- **`draw_polygon(color, filled=False, *vertices)`**: Dibuja un polígono usando una lista de vértices. Si `filled=True`, el polígono se rellena.
+# TO DO LIST
 
-### 3. `write`
-Este módulo proporciona funciones para escribir texto en la pantalla.
+~~Agregar conectividad Wi-Fi.~~  
+~~Agregar soporte para la tarjeta SD.~~  
+~~Conseguir leer archivos desde la SD.~~  
+~~Conseguir escribir archivos en la SD.~~  
+~~Conseguir borrar archivos de la SD.~~  
+~~Crear una herramienta de diagnóstico.~~
 
-- **`text(x, y, text, color, bg_color, size=8)`**: Dibuja un texto en la posición `(x, y)` usando la fuente especificada. El tamaño de la fuente puede ajustarse a 8x8, 10x10 o 12x12, con un valor predeterminado de 8x8.
+**Pendiente:**
 
-### 4. `image`
-Este módulo permite mostrar imágenes BMP en la pantalla.
+- Mejorar la interfaz gráfica y la navegación con el botón BOOT.
+- Seguir optimizando las primitivas gráficas.
+- Incorporar un explorador de directorios completo.
+- Probar comunicaciones reales entre dos dispositivos ESP-NOW.
+- Desarrollar ejemplos de comunicación BLE.
+- Investigar la convivencia de Wi-Fi, ESP-NOW y Bluetooth.
+- Ampliar las pruebas de los GPIO, UART e I²C.
+- Continuar adaptando funcionalidades para CircuitPython.
+- Ordenar y documentar todo esto un poco mejor.
 
-- **`show_bmp(file_path, x_offset=0, y_offset=0)`**: Muestra un archivo BMP en la pantalla. El archivo BMP debe estar en formato de 24 bits (RGB888). Los valores `x_offset` y `y_offset` permiten ajustar la posición de la imagen en la pantalla.
+La microSD merece una mención especial.
 
-## Uso Básico
-### Inicialización de la Pantalla
-Antes de comenzar a dibujar, debemos inicializar la pantalla y configurarla:
+En la primera versión de este repositorio escribí que quizás intentaría integrarla, aunque no prometía nada porque ya había probado de todo y no había con qué darle.
+
+Bueno, finalmente **la desgraciada funciona**.
+
+Y no solamente podemos listar archivos: también podemos crearlos, leerlos, comprobar que sobreviven a un reinicio y eliminarlos.
+
+Por ahora esto sigue en construcción. Sepan disculpar el desorden, aunque sospecho que va a continuar habiendo un poco.
+
+---
+
+# 1. Hardware y requisitos
+
+Este proyecto está desarrollado para el **Waveshare ESP32-S3-GEEK**, utilizando MicroPython.
+
+La configuración actual ha sido probada con:
+
+```text
+MicroPython v1.29.0
+Generic ESP32S3
+ESP32-S3-GEEK
+```
+
+Otras versiones de MicroPython podrían funcionar, pero no están verificadas.
+
+## Características utilizadas
+
+| Componente | Uso |
+|---|---|
+| ESP32-S3 | Microcontrolador principal |
+| ST7789 | Pantalla LCD de 240 × 135 píxeles |
+| SPI | Comunicación con la pantalla y la microSD |
+| MicroSD | Almacenamiento de archivos |
+| Wi-Fi | Conexión y búsqueda de redes |
+| BLE | Comunicación Bluetooth Low Energy |
+| ESP-NOW | Comunicación inalámbrica entre dispositivos compatibles |
+| BOOT | Entrada física para pruebas y futuras interfaces |
+| I²C / UART | Interfaces disponibles para periféricos externos |
+
+## Pines utilizados
+
+### Display ST7789
+
+| Señal | GPIO |
+|---|---|
+| SCK | 12 |
+| MOSI | 11 |
+| CS | 10 |
+| DC | 8 |
+| RST | 9 |
+
+### Tarjeta microSD
+
+| Señal | GPIO |
+|---|---|
+| CLK | 36 |
+| MOSI | 35 |
+| MISO | 37 |
+| CS | 34 |
+
+Estos son los pines utilizados por los controladores desarrollados para este proyecto.
+
+El display y la microSD usan interfaces SPI con configuraciones diferentes, así que cada módulo debe inicializar su periférico correctamente.
+
+---
+
+# 2. Instalación
+
+En principio, con copiar los módulos necesarios a la raíz del sistema de archivos de MicroPython debería funcionar.
+
+Digo *en principio* porque estamos hablando de microcontroladores, y estos bichos tienen una habilidad admirable para encontrar excepciones a las reglas.
+
+## Archivos principales
+
+```text
+/
+├── display.py
+├── draw.py
+├── write.py
+├── image.py
+│
+├── font_small.py
+├── font_medium.py
+├── font_large.py
+│
+├── sdspi_raw.py
+├── sd_files.py
+│
+├── connectivity.py
+├── wifi_safe.py
+│
+├── geek_app.py
+├── geek_diagnostic.py
+│
+└── secrets.py
+```
+
+`secrets.py` es opcional para las funciones que no requieren conectarse a una red Wi-Fi.
+
+El repositorio también puede incluir ejemplos, imágenes y archivos experimentales.
+
+**Importante:** los módulos de texto dependen de los tres archivos de fuentes. Si falta alguno, MicroPython puede producir un `ImportError`.
+
+## Instalación mediante Thonny
+
+1. Instalar MicroPython compatible con ESP32-S3.
+2. Conectar el ESP32-S3-GEEK por USB.
+3. Seleccionar el intérprete MicroPython en Thonny.
+4. Copiar los archivos de la biblioteca a la memoria del dispositivo.
+5. Reiniciar MicroPython.
+6. Ejecutar uno de los ejemplos.
+
+Para comenzar, recomiendo probar primero el display y después el diagnóstico completo.
+
+No es necesario ejecutar todo desde un `main.py`. También se pueden importar los módulos individualmente desde el REPL.
+
+---
+
+# 3. Librería para el control de pantalla
+
+La biblioteca permite inicializar el ST7789, configurar la orientación y escribir datos de imagen en formato RGB565.
+
+## Módulo `display.py`
+
+Funciones principales:
+
+- `init_display()`: inicializa el display.
+- `fill_screen(color)`: rellena la pantalla con un color.
+- `set_rotation(rotation)`: configura la orientación.
+- `set_active_window(x0, y0, x1, y1)`: establece una región de escritura.
+- `set_window_and_write(x0, y0, x1, y1, data)`: escribe datos RGB565 en una región.
+
+Las coordenadas comienzan en cero.
+
+Para una orientación horizontal de 240 × 135 píxeles:
+
+```text
+X: 0 a 239
+Y: 0 a 134
+```
+
+Los valores fuera de esos límites deben recortarse o descartarse antes de enviarlos al controlador.
+
+## Inicializar el display
+
 ```python
 import display
 
-# Inicializar el display
 display.init_display()
+display.set_rotation(3)
 
-# Llenar la pantalla con un color (azul en este caso)
-display.fill_screen(0b0000000000011111)  # Color azul (RGB565)
+display.fill_screen(0x0000)
 ```
 
-### Configuración de Colores
-Los colores deben ser especificados en formato RGB565 (5 bits para el rojo, 6 bits para el verde y 5 bits para el azul). Ejemplo:
+La rotación se configura con:
+
 ```python
-red = 0b1111100000000000    # Rojo puro
-green = 0b0000011111100000  # Verde puro
-blue = 0b0000000000011111   # Azul puro
-yellow = 0b1111111111100000 # Amarillo
-black = 0b0000000000000000  # Negro
-white = 0b1111111111111111  # Blanco
+display.set_rotation(0)
+display.set_rotation(1)
+display.set_rotation(2)
+display.set_rotation(3)
 ```
 
-### Dibujar en la Pantalla
-Usamos el módulo `draw` para dibujar formas como píxeles, líneas, rectángulos, círculos y polígonos:
+Los valores van de `0` a `3`.
+
+No todas las orientaciones tienen las mismas dimensiones lógicas. Hay que tenerlo presente cuando se dibuja cerca de los bordes.
+
+---
+
+# 4. Colores RGB565
+
+Finalmente tenemos colores RGB como corresponde.
+
+RGB565 utiliza 16 bits por píxel:
+
+- 5 bits para el rojo.
+- 6 bits para el verde.
+- 5 bits para el azul.
+
+Esto permite representar 65.536 colores.
+
+Ejemplos:
+
 ```python
+red    = 0xF800
+green  = 0x07E0
+blue   = 0x001F
+
+yellow = 0xFFE0
+cyan   = 0x07FF
+purple = 0xF81F
+
+black  = 0x0000
+white  = 0xFFFF
+```
+
+También podemos expresarlos en binario:
+
+```python
+red   = 0b1111100000000000
+green = 0b0000011111100000
+blue  = 0b0000000000011111
+```
+
+## Convertir RGB888 a RGB565
+
+Si tenemos colores de 8 bits por canal, podemos convertirlos así:
+
+```python
+def rgb565(r, g, b):
+    return (
+        ((r & 0xF8) << 8)
+        | ((g & 0xFC) << 3)
+        | (b >> 3)
+    )
+```
+
+Ejemplo:
+
+```python
+orange = rgb565(255, 165, 0)
+```
+
+Esto sirve cuando trabajamos con colores definidos en RGB888.
+
+No es necesario realizar esta conversión si ya tenemos el color en RGB565.
+
+---
+
+# 5. Módulo `draw.py`
+
+Este es el módulo pensado para dibujar sin tener que enviar manualmente comandos al ST7789.
+
+La idea es que un principiante pueda comenzar a experimentar inmediatamente.
+
+## Funciones disponibles
+
+| Función | Descripción |
+|---|---|
+| `pixel(x, y, color)` | Dibuja un píxel |
+| `line(x0, y0, x1, y1, color)` | Dibuja una línea |
+| `rectangle(x0, y0, x1, y1, color, filled=False)` | Dibuja un rectángulo |
+| `circle(x, y, radius, color, filled=False)` | Dibuja un círculo |
+| `polygon(color, filled=False, *vertices)` | Dibuja un polígono |
+
+El parámetro `filled` indica si la figura debe rellenarse.
+
+## Ejemplo completo
+
+```python
+import display
 import draw
 
-# Dibujar píxeles en la pantalla
-draw.draw_pixel(134, 0, red)  # Esquina superior derecha
-draw.draw_pixel(120, 150, blue)  # Un punto en el medio
+display.init_display()
+display.set_rotation(3)
+display.fill_screen(0x0000)
+
+red = 0xF800
+green = 0x07E0
+blue = 0x001F
+yellow = 0xFFE0
+
+# Un pixel
+draw.pixel(20, 20, red)
+
+# Una linea
+draw.line(0, 0, 100, 50, green)
+
+# Rectangulo relleno
+draw.rectangle(
+    10, 60,
+    60, 110,
+    blue,
+    True
+)
+
+# Circulo
+draw.circle(
+    120, 65,
+    30,
+    yellow,
+    False
+)
+
+# Poligono relleno
+draw.polygon(
+    red,
+    True,
+    (160, 20),
+    (220, 40),
+    (190, 110)
+)
 ```
 
-### Escribir Texto
-El módulo `write` se utiliza para escribir texto en la pantalla:
+## Correcciones realizadas
+
+Durante la integración aparecieron algunos problemas de compatibilidad entre el módulo `display.py` y la clase `Draw`.
+
+Por ejemplo, algunas versiones utilizaban:
+
 ```python
+display.height
+```
+
+Mientras que otras exponían:
+
+```python
+display.HEIGHT
+```
+
+Esto provocaba errores al dibujar polígonos rellenos.
+
+Se corrigió el manejo de las dimensiones para mantener la compatibilidad con ambas interfaces.
+
+También se revisó el algoritmo de relleno de polígonos y el recorte de las figuras en los bordes de la pantalla.
+
+Ahora el módulo puede utilizarse mediante funciones tradicionales o mediante la clase `Draw`.
+
+La intención es conservar la API original para no obligar a reescribir todos los ejemplos anteriores.
+
+---
+
+# 6. Módulo `write.py`
+
+Este módulo permite escribir texto directamente en el ST7789.
+
+Incluye tres tamaños de fuente:
+
+- 8 × 8 píxeles.
+- 10 × 10 píxeles.
+- 12 × 12 píxeles.
+
+## Uso
+
+```python
+import display
 import write
 
-# Escribir texto en la pantalla
-write.text(10, 20, 'Hola Mundo!', white, black)
+display.init_display()
+display.fill_screen(0x0000)
+
+white = 0xFFFF
+black = 0x0000
+
+write.text(
+    10, 20,
+    "Hola Mundo!",
+    white,
+    black,
+    size=8
+)
 ```
 
-### Mostrar una Imagen BMP
-Para mostrar una imagen BMP en la pantalla, usamos el módulo `image`:
+## Distintos tamaños
+
 ```python
+write.text(
+    10, 40,
+    "Texto 10x10",
+    white,
+    black,
+    size=10
+)
+
+write.text(
+    10, 70,
+    "Texto 12x12",
+    white,
+    black,
+    size=12
+)
+```
+
+## Corrección de texto fuera de pantalla
+
+En la versión original, si un carácter quedaba fuera de los límites, el controlador podía producir un error como este:
+
+```text
+ValueError: Window outside display:
+(240, 60, 249, 69)
+```
+
+Esto sucedía porque la pantalla tiene un ancho máximo de 240 píxeles y el código intentaba escribir a partir de la coordenada `240`.
+
+Ahora `write.py` recorta automáticamente los caracteres en los bordes.
+
+Un texto demasiado largo no provoca una excepción: simplemente se muestra la parte que entra en la pantalla.
+
+También se añadió soporte para saltos de línea y funciones auxiliares para calcular o limitar el ancho del texto.
+
+**Importante:** recortar un texto no significa ajustarlo automáticamente a varias líneas.
+
+El ajuste de texto (*word wrapping*) continúa siendo una posible mejora futura.
+
+---
+
+# 7. Módulo `image.py`
+
+Este módulo permite mostrar imágenes BMP de 24 bits en el ST7789.
+
+## Ejemplo
+
+```python
+import display
 import image
 
-# Mostrar una imagen BMP desde un archivo
-image.show_bmp('/ESP32-S3-GEEK.bmp', x_offset=0, y_offset=0)
+display.init_display()
+
+image.show_bmp(
+    "/ESP32-S3-GEEK.bmp",
+    x_offset=0,
+    y_offset=0
+)
 ```
 
-## Fuentes de Texto
-La librería incluye tres tamaños de fuente (8x8, 10x10 y 12x12). El tamaño de la fuente puede especificarse en la función `write.text` utilizando el parámetro `size`. El valor predeterminado es 8x8, pero puede configurarse como 10x10 o 12x12 para un texto más grande:
+El archivo debe encontrarse en una ruta accesible desde MicroPython.
+
+La implementación integrada procesa las imágenes por filas para reducir la necesidad de reservar memoria para la imagen completa.
+
+Esto es especialmente útil en dispositivos con recursos limitados.
+
+Por ahora se trabaja con el formato BMP compatible con la implementación. No es un decodificador universal de imágenes.
+
+---
+
+# 8. Tarjeta microSD
+
+Esta parte merece su propia sección porque fue, durante bastante tiempo, una auténtica molestia.
+
+Inicialmente no conseguía hacer funcionar la microSD desde MicroPython.
+
+Podía utilizar algunas funcionalidades con CircuitPython, pero integrar todo en un único programa parecía una misión bastante absurda.
+
+Finalmente desarrollamos un controlador específico para comunicarnos con la tarjeta mediante SPI.
+
+## Arquitectura
+
+El soporte de almacenamiento está dividido en dos módulos:
+
+### `sdspi_raw.py`
+
+Controla la comunicación de bajo nivel con la tarjeta.
+
+Se encarga de inicializarla e intercambiar comandos y bloques de datos mediante SPI.
+
+### `sd_files.py`
+
+Proporciona una interfaz más sencilla para trabajar con archivos.
+
+Utiliza el sistema de archivos FAT integrado en MicroPython, a través del controlador de bloques.
+
+Esto significa que no estamos implementando FAT32 manualmente.
+
+Estamos controlando el acceso a la tarjeta y dejando la gestión de archivos en manos del sistema de archivos que ya proporciona MicroPython.
+
+## Montar la tarjeta
+
 ```python
-write.text(10, 60, 'Texto 10x10', white, black, size=10)
-write.text(10, 100, 'Texto 12x12', white, black, size=12)
+from sd_files import SDStorage
+
+sd = SDStorage()
+sd.mount()
 ```
 
-## Conclusión
-Esta librería permite controlar la pantalla del ESP32-S3-GEEK de manera sencilla, ofreciendo herramientas para dibujar gráficos y mostrar texto con diferentes fuentes y tamaños. Es útil para proyectos interactivos donde se necesita una interfaz visual con gráficos y texto.
+La tarjeta queda montada en `/sd`.
 
-## Archivos del Proyecto
-Los archivos que debes incluir en tu proyecto son:
-- `display.py`: Controla la pantalla y sus configuraciones.
-- `draw.py`: Funciones para dibujar en la pantalla.
-- `write.py`: Funciones para escribir texto en la pantalla.
-- `image.py`: Función para mostrar imágenes BMP en la pantalla.
+## Listar archivos
+
+```python
+import os
+
+print(os.listdir("/sd"))
+```
+
+## Crear un archivo
+
+```python
+with open("/sd/hola.txt", "w") as f:
+    f.write("Hola desde MicroPython!")
+```
+
+## Leerlo
+
+```python
+with open("/sd/hola.txt", "r") as f:
+    print(f.read())
+```
+
+## Borrarlo
+
+```python
+import os
+
+os.remove("/sd/hola.txt")
+```
+
+## Pruebas realizadas
+
+El controlador fue probado físicamente en el ESP32-S3-GEEK.
+
+Se verificó que permite:
+
+- Inicializar y montar la tarjeta.
+- Listar los archivos existentes.
+- Leer archivos creados previamente con CircuitPython.
+- Crear archivos nuevos.
+- Leer y comprobar su contenido.
+- Reiniciar MicroPython y volver a leerlos.
+- Eliminar archivos.
+- Verificar que fueron eliminados.
+
+En una de las pruebas se encontraron 80 elementos en la tarjeta.
+
+También se comprobó la lectura de archivos de texto creados originalmente desde CircuitPython.
+
+Por ejemplo:
+
+```text
+Hola, este es el archivo 39
+creado desde CircuitPython.
+```
+
+**Así que sí: finalmente la SD funciona.**
+
+No obstante, esto no significa que todas las tarjetas SD existentes hayan sido probadas.
+
+Todavía quedan pendientes las pruebas de estrés, el manejo de errores durante escrituras interrumpidas y la compatibilidad con distintas tarjetas.
+
+Hacé una copia de seguridad antes de experimentar con archivos importantes.
+
+---
+
+# 9. Administrador de archivos
+
+El módulo `geek_app.py` incluye un administrador básico para trabajar con los archivos de la microSD.
+
+La versión nueva permite mostrar listados paginados tanto en la pantalla como en el REPL.
+
+## Funcionalidades
+
+- Mostrar la cantidad de archivos.
+- Recorrer las páginas del listado.
+- Seleccionar archivos mediante números.
+- Leer una vista previa.
+- Crear archivos de texto.
+- Borrar archivos con confirmación.
+- Mostrar mensajes en el display.
+
+## Ejecutar la aplicación
+
+```python
+import geek_app
+
+geek_app.main()
+```
+
+Desde Thonny aparece un menú similar a este:
+
+```text
+GEEK CONTROL
+
+1 SD files
+2 WiFi scan
+3 Connect WiFi
+4 BLE / ESP-NOW
+5 Graphics
+6 Diagnostic
+0 Quit
+```
+
+Al elegir la opción `1`, se abre el administrador de archivos.
+
+## Navegación
+
+```text
+N = siguiente pagina
+P = pagina anterior
+Numero = abrir archivo
+L = listar todos
+C = crear archivo
+D = borrar archivo
+B = volver
+```
+
+Para abrir un archivo solamente hay que escribir su número.
+
+Ya no es necesario recordar el nombre completo.
+
+La pantalla ST7789 muestra la página actual del listado y puede presentar una vista previa del contenido.
+
+Por ahora los comandos se introducen desde Thonny.
+
+El objetivo futuro es permitir la navegación mediante el botón BOOT, utilizando pulsaciones cortas y largas.
+
+También queda pendiente implementar navegación por subdirectorios.
+
+---
+
+# 10. Wi-Fi
+
+El ESP32-S3 incluye conectividad Wi-Fi.
+
+Se incorporó una implementación con control de tiempo de espera para evitar que el programa quede bloqueado indefinidamente cuando una red no responde.
+
+## Módulo `wifi_safe.py`
+
+Ejemplo:
+
+```python
+import wifi_safe
+
+wlan = wifi_safe.connect(
+    "MI_RED",
+    "MI_PASSWORD",
+    timeout=15
+)
+
+print(wlan.ifconfig())
+```
+
+## Desconectar
+
+```python
+wifi_safe.disconnect()
+```
+
+## Credenciales
+
+Para los ejemplos que utilizan un archivo de configuración, se puede crear `secrets.py`:
+
+```python
+WIFI_SSID = "MI_RED"
+WIFI_PASSWORD = "MI_PASSWORD"
+```
+
+No publiques este archivo con tus contraseñas reales en GitHub.
+
+## Pruebas realizadas
+
+Se verificó que el ESP32-S3-GEEK puede:
+
+- Inicializar Wi-Fi.
+- Buscar puntos de acceso.
+- Detectar redes cercanas.
+- Conectarse a una red.
+- Obtener una dirección IP.
+
+También se integraron controles de timeout para evitar esperas infinitas.
+
+El manejo de todas las posibles desconexiones todavía necesita más pruebas.
+
+---
+
+# 11. Bluetooth Low Energy
+
+El ESP32-S3 dispone de Bluetooth Low Energy, o BLE.
+
+MicroPython proporciona acceso a esta funcionalidad mediante el módulo `bluetooth`.
+
+## Ejemplo básico
+
+```python
+import bluetooth
+
+ble = bluetooth.BLE()
+ble.active(True)
+
+print("BLE:", ble.active())
+```
+
+Esto inicializa la pila Bluetooth.
+
+**Pero inicializar BLE no es lo mismo que comprobar una conexión real.**
+
+En las pruebas de diagnóstico conseguimos realizar una búsqueda BLE y recibir 77 anuncios de dispositivos cercanos.
+
+Esto confirma que el dispositivo puede recibir anuncios BLE.
+
+Quedan pendientes ejemplos completos de:
+
+- Servicios GATT.
+- Características.
+- Lectura y escritura.
+- Notificaciones.
+- Conexión entre dispositivos.
+
+No hay que confundir BLE con Bluetooth Classic. El ESP32-S3 no ofrece Bluetooth Classic.
+
+---
+
+# 12. ESP-NOW
+
+ESP-NOW es un protocolo de comunicación inalámbrica utilizado por dispositivos Espressif.
+
+Permite intercambiar mensajes entre dispositivos compatibles sin necesidad de establecer una conexión TCP/IP convencional.
+
+Es especialmente interesante para sensores, controles remotos y proyectos con varios microcontroladores.
+
+## Ejemplo de inicialización
+
+```python
+import network
+import espnow
+
+sta = network.WLAN(network.STA_IF)
+sta.active(True)
+
+e = espnow.ESPNow()
+e.active(True)
+
+print("ESP-NOW inicializado")
+```
+
+## Limitaciones importantes
+
+Wi-Fi y ESP-NOW utilizan la radio de 2,4 GHz del ESP32-S3.
+
+Esto no significa que sean incompatibles ni que resulte imposible utilizarlos simultáneamente.
+
+Sin embargo, **hay que prestar especial atención a la configuración del canal**.
+
+Cuando el dispositivo está conectado a un punto de acceso Wi-Fi, el canal de esa conexión condiciona las comunicaciones ESP-NOW.
+
+También resulta posible combinar funcionalidades Wi-Fi, BLE y ESP-NOW, pero hay que tener en cuenta la coexistencia de radio y las limitaciones del firmware.
+
+No voy a prometer que todo funciona simultáneamente en cualquier combinación, porque todavía estamos probándolo.
+
+## Estado actual
+
+Se comprobó que ESP-NOW puede inicializarse correctamente desde MicroPython.
+
+Todavía falta verificar el envío y recepción de mensajes entre dos placas.
+
+Así que, por ahora:
+
+**ESP-NOW inicializa. La comunicación real sigue pendiente.**
+
+---
+
+# 13. Diagnóstico de hardware
+
+Se añadió `geek_diagnostic.py`, una pequeña herramienta para comprobar los subsistemas principales del dispositivo.
+
+## Ejecutar
+
+```python
+import geek_diagnostic
+
+geek_diagnostic.main()
+```
+
+La aplicación muestra resultados en el REPL y utiliza el display para algunas pruebas visuales.
+
+## Funciones verificadas
+
+| Prueba | Resultado observado |
+|---|---|
+| Display ST7789 | Secuencia gráfica ejecutada |
+| Memoria | Aproximadamente 1,9 MiB de heap libre |
+| Botón BOOT | Pulsación detectada |
+| MicroSD | Lectura, escritura y borrado correctos |
+| Wi-Fi | Búsqueda y conexión correctas |
+| BLE | Recepción de anuncios |
+| ESP-NOW | Inicialización correcta |
+| I²C / UART | Pendiente de pruebas con hardware externo |
+
+Uno de los diagnósticos devolvió:
+
+```text
+SYSTEM : OK 1910 KB
+BOOT BTN : OK pressed
+SD R/W/DEL : OK 80 items
+WIFI : OK 192.168.2.90
+BLE SCAN : OK 77 ads
+ESP NOW : OK init only
+I2C/UART : SKIP no device
+```
+
+La dirección IP corresponde a la red utilizada durante esa prueba. No es una dirección fija del dispositivo.
+
+**Estas pruebas no garantizan que todos los periféricos funcionen en cualquier circunstancia.**
+
+Algunas verifican operaciones completas y otras solamente inicialización.
+
+Por ejemplo, el envío real de paquetes ESP-NOW continúa pendiente.
+
+---
+
+# 14. Ejemplo gráfico completo
+
+Este ejemplo combina inicialización, dibujo y escritura de texto.
+
+```python
+import display
+import draw
+import write
+
+BLACK = 0x0000
+WHITE = 0xFFFF
+RED = 0xF800
+GREEN = 0x07E0
+BLUE = 0x001F
+YELLOW = 0xFFE0
+
+display.init_display()
+display.set_rotation(3)
+display.fill_screen(BLACK)
+
+# Titulo
+write.text(
+    5, 5,
+    "ESP32-S3-GEEK",
+    WHITE,
+    BLACK,
+    size=10
+)
+
+# Rectangulo
+draw.rectangle(
+    5, 30,
+    65, 75,
+    RED,
+    True
+)
+
+# Circulo
+draw.circle(
+    110, 70,
+    28,
+    GREEN,
+    False
+)
+
+# Triangulo
+draw.polygon(
+    BLUE,
+    True,
+    (160, 35),
+    (230, 60),
+    (190, 110)
+)
+
+# Texto inferior
+write.text(
+    5, 120,
+    "Hello MicroPython!",
+    YELLOW,
+    BLACK,
+    size=8
+)
+```
+
+No hace falta crear un framebuffer enorme ni estudiar todo el protocolo del ST7789 para comenzar a dibujar.
+
+Naturalmente, si después querés entender cómo funciona, el código está ahí para leerlo.
+
+Esa es justamente la idea.
+
+---
+
+# 15. Problemas conocidos y soluciones
+
+## `ImportError: no module named 'write'`
+
+El archivo `write.py` no se encuentra en la ruta de importación de MicroPython.
+
+Verificar que esté guardado en la placa, junto con:
+
+```text
+font_small.py
+font_medium.py
+font_large.py
+```
+
+## `AttributeError: 'module' object has no attribute 'height'`
+
+Este error apareció por una incompatibilidad entre las interfaces de `draw.py` y `display.py`.
+
+Se corrigió el acceso a las dimensiones de la pantalla.
+
+Utilizar versiones compatibles de ambos archivos.
+
+## `ValueError: Window outside display`
+
+Ocurría cuando el código intentaba escribir fuera de los límites del ST7789.
+
+El módulo `write.py` fue modificado para recortar los caracteres que exceden los bordes.
+
+Las coordenadas válidas dependen de la orientación configurada.
+
+## No aparecen los archivos de la SD en pantalla
+
+Las primeras versiones del administrador mostraban solamente el número de archivos en el display y los nombres completos en Thonny.
+
+La interfaz posterior añade un listado paginado en pantalla.
+
+Para seleccionar archivos todavía se utiliza el REPL.
+
+## La SD no monta
+
+Revisar:
+
+- Que la tarjeta esté correctamente insertada.
+- Que el controlador esté copiado a la placa.
+- Que los pines SPI sean correctos.
+- Que la tarjeta tenga un sistema de archivos FAT compatible.
+- Que ningún otro programa esté utilizando simultáneamente el periférico de forma incompatible.
+
+No formatees una tarjeta que contiene información importante sin antes guardar una copia de seguridad.
+
+## Wi-Fi no conecta
+
+Comprobar SSID, contraseña, cobertura y compatibilidad de la red.
+
+El ESP32-S3 utiliza Wi-Fi de 2,4 GHz.
+
+Utilizar un timeout para evitar que el programa espere indefinidamente.
+
+## `MemoryError`
+
+No todas las operaciones tienen las mismas necesidades de memoria.
+
+Evitar cargar imágenes o archivos grandes enteros cuando pueden procesarse por partes.
+
+Se recomienda utilizar lecturas parciales y liberar objetos temporales cuando dejan de ser necesarios.
+
+---
+
+# 16. Filosofía del proyecto
+
+Mi intención no es crear una biblioteca gigantesca con veinte dependencias para poder dibujar una línea.
+
+Quiero algo sencillo, comprensible y que se pueda modificar.
+
+Una biblioteca que permita utilizar el ESP32-S3-GEEK sin tener que empezar desde cero, pero que al mismo tiempo deje ver cómo funciona todo.
+
+Si quiero dibujar un círculo, quiero poder dibujarlo.
+
+Y si mañana quiero abrir `draw.py` para entender el algoritmo, también quiero poder hacerlo.
+
+Lo mismo con la tarjeta SD.
+
+En lugar de esconder toda la comunicación detrás de una biblioteca externa, tenemos nuestro propio controlador SPI, y podemos estudiar qué ocurre cuando el microcontrolador inicializa la tarjeta, lee un sector o escribe datos.
+
+Eso para mí es parte de la diversión.
+
+**Este proyecto sigue siendo experimental.**
+
+Hay funciones que están probadas en hardware real, otras que necesitan más pruebas y algunas que todavía están en desarrollo.
+
+No prometo que todo funcione siempre, pero al menos ahora, cuando algo no funciona, tenemos mejores herramientas para averiguar por qué.
+
+Y considerando cómo empezó todo esto, ya es bastante.
+
+---
+
+# 17. Conclusión
+
+Empecé intentando controlar una pequeña pantalla.
+
+Después quise dibujar figuras.
+
+Después escribir texto.
+
+Después mostrar imágenes.
+
+Después apareció el problema de la microSD.
+
+Y ahora resulta que estamos trabajando con Wi-Fi, BLE, ESP-NOW, controladores SPI y un pequeño administrador de archivos.
+
+En algún momento habrá que decidir dónde termina esto, aunque sospecho que todavía falta bastante.
+
+Por ahora, **el ESP32-S3-GEEK funciona con MicroPython y ya podemos aprovechar una buena parte de su hardware desde una sola aplicación**.
+
+El resto sigue en construcción.
+
+Se aceptan sugerencias, correcciones y contribuciones.
+
+Y si encuentran alguna conspiración internacional relacionada con el orden BRG de los colores, por favor avisen.
+
+Quiero saber si finalmente teníamos razón.
 
 
 
-# Conectividad del ESP32-S3-GEEK
-
-el modulo connectivity.py  abarca wifi, blutooth y ESP - NOW
-IMPORTANTE wifi y ESP NOW comparten la misma antena, por lo cual se generan conflictos al intentar inicializar ambos protocolos y no funciona ni el uno ni el otro
-ESP - NOW puede ser usado simultaneamente con bluetooth sin problemas ( I think ) todavia estoy trabajando en el desarrollo de este modulo.
-
-
-## he incluido un ejemplo de interface interfaceUI.py
-
-
-recuerda que la orientacion se configura con display.set_rotation() y acepta parametros del 0 al 3
 
 
 
