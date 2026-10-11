@@ -1057,7 +1057,6 @@ Quiero saber si finalmente teníamos razón.
 
 
 
-¡Disfruta programando tu ESP32-S3-GEEK!
-
+Happy hacking! 🔧
 
 
